@@ -1,55 +1,60 @@
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
+import io
 import json
-import configparser
+import ConfigParser
 import logging
 import os
 import sys
 from datetime import datetime
+from io import open
 
-config_file = 'config.ini'
+config_file = u'config.ini'
 
 
 def is_frozen():
     # determine if application is a script file or frozen exe
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, u'frozen', False):
         application_path = os.path.dirname(sys.executable)
     elif __file__:
-        application_path = os.path.abspath('..')
+        application_path = os.path.abspath(u'..')
 
     return application_path
 
 
 def get_config_path():
-    return os.path.join(is_frozen(), 'configs' + os.sep + config_file)
+    return os.path.join(is_frozen(), u'configs' + os.sep + config_file)
 
 
 def get_config_folder_path():
-    return os.path.join(is_frozen(), 'configs')
+    return os.path.join(is_frozen(), u'configs')
 
 
 def get_log_config_path():
-    return os.path.join(is_frozen(), 'configs' + os.sep + 'log_config.json')
+    return os.path.join(is_frozen(), u'configs' + os.sep + u'log_config.json')
 
 
 def get_persistence_path():
-    return os.path.join(is_frozen(), 'persistence' + os.sep + 'persistence.json')
+    return os.path.join(is_frozen(), u'persistence' + os.sep + u'persistence.json')
 
 
 def get_route_errors_path():
-    return os.path.join(is_frozen(), 'persistence' + os.sep + 'route_errors.json')
+    return os.path.join(is_frozen(), u'persistence' + os.sep + u'route_errors.json')
 
 
 def get_db_path():
-    return os.path.join(is_frozen(), 'database')
+    return os.path.join(is_frozen(), u'database')
 
 
 def get_logging_filename():
-    log_filename = os.path.join(is_frozen(), 'logs' + os.sep + 'waze.log')
-    log_error_filename = os.path.join(is_frozen(), 'logs' + os.sep + 'waze_errors.log')
+    log_filename = os.path.join(is_frozen(), u'logs' + os.sep + u'waze.log')
+    log_error_filename = os.path.join(is_frozen(), u'logs' + os.sep + u'waze_errors.log')
     return log_filename, log_error_filename
 
 
 def timestamp_to_datetime(timestamp):
-    return datetime.fromtimestamp(timestamp/1000.0).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    return datetime.fromtimestamp(timestamp/1000.0).strftime(u"%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 def time_to_minutes(time_now):
@@ -57,13 +62,13 @@ def time_to_minutes(time_now):
 
 
 def check_for_data_integrity(data):
-    if any([data['updateTime'] == 0, data['updateTime'] == '']):
-        raise Exception('Data did not pass the integrity check, cannot proceed')
+    if any([data[u'updateTime'] == 0, data[u'updateTime'] == u'']):
+        raise Exception(u'Data did not pass the integrity check, cannot proceed')
 
 
 def get_omit_routes_list():
     omit_list = []
-    omit_routes = config['OmitRoutes']
+    omit_routes = []  # config[u'OmitRoutes']
     for x in omit_routes:
         omit_list.append(int(x))
 
@@ -71,7 +76,7 @@ def get_omit_routes_list():
 
 def get_omit_feed_list():
     omit_list = []
-    omit_routes = config['OmitUids']
+    omit_routes = []  # config[u'OmitUids']
     for x in omit_routes:
         omit_list.append(x)
 
@@ -102,37 +107,39 @@ def read_json(file=None):
 
 def counter_reset():
     # reset json counter
-    logging.debug('Reset json counter')
-    persistence_update('counter', 0, 'equals')
+    logging.debug(u'Reset json counter')
+    persistence_update(u'counter', 0, u'equals')
 
 
 def persistence_update(key, value, operator):
     json_file = read_json()
 
-    if operator is 'add':
+    if operator is u'add':
         json_file[key] += value
-    elif operator is 'equals':
+    elif operator is u'equals':
         json_file[key] = value
 
-    with open(get_persistence_path(), 'w') as f:
-        json.dump(json_file, f, indent=2)
+    #with open(get_persistence_path(), u'w') as f:
+    #    json.dump(json_file, f, indent=2)
+    with io.open(get_persistence_path(), 'w',encoding="utf-8") as f:
+      f.write(unicode(json.dumps(json_file, ensure_ascii=False)))
 
     return json_file
 
 
-config = configparser.ConfigParser(allow_no_value=True)
+config = ConfigParser.ConfigParser(allow_no_value=True)
 config.read(get_config_path())
 
 
 def sql_format(sql):
-    use_postgres = config.getboolean('Postgres', 'use_postgres')
+    use_postgres = config.getboolean(u'Postgres', u'use_postgres')
     if use_postgres:
-        sql = sql.replace("?", "%s")
-        sql = sql.replace("0", "false")
-        sql = sql.replace("1", "true")
+        sql = sql.replace(u"?", u"%s")
+        sql = sql.replace(u"0", u"false")
+        sql = sql.replace(u"1", u"true")
 
     return sql
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     pass

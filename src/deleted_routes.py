@@ -1,12 +1,13 @@
+from __future__ import absolute_import
 import logging
 
 import helper
 
 
-class DeletedRoutes:
+class DeletedRoutes(object):
 
-    def __init__(self, db, rl) -> None:
-        super().__init__()
+    def __init__(self, db, rl):
+        super(DeletedRoutes, self).__init__()
         self.database_conn = db
         self.live_route_list = rl
         self.db_route_list = None
@@ -19,7 +20,7 @@ class DeletedRoutes:
         if len(self.match_list[1]) > 0:
             self.update_db()
         else:
-            logging.info('No deleted routes')
+            logging.info(u'No deleted routes')
 
     def get_route_list(self):
         l = []
@@ -29,7 +30,7 @@ class DeletedRoutes:
         return l
 
     def get_database_routes(self):
-        sql_routes = """SELECT route_id FROM routes WHERE deleted = 0 or deleted is null"""
+        sql_routes = u"""SELECT route_id FROM routes WHERE deleted = 0 or deleted is null"""
 
         c = self.database_conn.cursor()
         c.execute(helper.sql_format(sql_routes))
@@ -43,15 +44,15 @@ class DeletedRoutes:
     def update_db(self):
         deleted_list = tuple(self.match_list[1])
 
-        sql_update = """UPDATE routes SET deleted = 1 WHERE route_id = ?"""
+        sql_update = u"""UPDATE routes SET deleted = 1 WHERE route_id = ?"""
 
         c = self.database_conn.cursor()
         for route in deleted_list:
-            logging.info(f"Route {route} is deleted, marking it in the database")
+            logging.info(u"Route %s is deleted, marking it in the database" % route)
             c.execute(helper.sql_format(sql_update), (route,))
 
     def get_deleted_routes(self):
-        sql_routes = """SELECT route_id FROM routes WHERE deleted = 1"""
+        sql_routes = u"""SELECT route_id FROM routes WHERE deleted = 1"""
 
         c = self.database_conn.cursor()
         c.execute(helper.sql_format(sql_routes))
@@ -64,5 +65,5 @@ class DeletedRoutes:
         return l
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     pass

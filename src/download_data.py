@@ -1,25 +1,26 @@
-import configparser
+from __future__ import absolute_import
+import ConfigParser
 import json
 import logging
-import urllib.request
+import urllib2, urllib
 
 import helper
 
-config = configparser.ConfigParser(allow_no_value=True)
+config = ConfigParser.ConfigParser(allow_no_value=True)
 config.read(helper.get_config_path())
 
 
 def get_data_from_website(url):
-    logging.info('try get info from website')
+    logging.info(u'try get info from website')
     try:
-        response = urllib.request.urlopen(url, timeout=5).read().decode('utf-8')
+        response = urllib2.urlopen(url, timeout=5).read().decode(u'utf-8')
         j = json.loads(response)
         return j
 
-    except Exception as e:
+    except Exception, e:
         logging.exception(e)
         raise
 
 
-if __name__ == '__main__':
+if __name__ == u'__main__':
     pass
