@@ -76,8 +76,9 @@ def create_message(subject, body, attach=None, type=None):
     message[u'to'] = get_email_users()
     message[u'from'] = FROM_EMAIL
     message[u'subject'] = subject
+    mime_body = MIMEText(body.encode('utf-8'), u'html', 'utf-8')
 
-    message.attach(MIMEText(body, u'html'))
+    message.attach(mime_body)
 
     if attach is not None:
         fp = open(attach)

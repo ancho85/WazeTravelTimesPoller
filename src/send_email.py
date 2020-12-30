@@ -63,7 +63,7 @@ def build_email(db):
         string += u'<td>%s</td>' % unicode(c_min)
         string += u'<td>%s</td>' % unicode(h_min)
         string += u'<td>%s</td>' % unicode(ddate)
-        string += u'</tr>' % unicode()
+        string += u'</tr>'
 
     string += u"</table>"
     string += u'</body></html>'

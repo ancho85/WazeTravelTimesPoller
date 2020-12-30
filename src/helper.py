@@ -85,6 +85,8 @@ def get_omit_feed_list():
 
 def check_congestion(time_now, time_historic, congested_percent):
     congestion_threshold = time_historic * (int(congested_percent) / 100)
+    logging.debug(u'time_now: %s, time_historic: %s' % (str(time_now), str(time_historic)))
+    logging.debug(u'congestion_threshold %s' % str(congestion_threshold))
 
     if time_now > congestion_threshold:
         congested = True
@@ -114,9 +116,9 @@ def counter_reset():
 def persistence_update(key, value, operator):
     json_file = read_json()
 
-    if operator is u'add':
+    if operator == u'add':
         json_file[key] += value
-    elif operator is u'equals':
+    elif operator == u'equals':
         json_file[key] = value
 
     #with open(get_persistence_path(), u'w') as f:
